@@ -116,6 +116,12 @@ macro(PCL_SUBSYS_DEPEND _var _name)
             endif(NOT ${EXT_DEP_FOUND} OR (NOT (${EXT_DEP_FOUND} STREQUAL "TRUE")))
         endforeach(_dep)
         endif(SUBSYS_EXT_DEPS)
+        if(SUBSYS_OPT_DEPS)
+        foreach(_dep ${SUBSYS_OPT_DEPS})
+            PCL_GET_SUBSYS_INCLUDE_DIR(_include_dir ${_dep})
+            include_directories(${PROJECT_SOURCE_DIR}/${_include_dir}/include)
+        endforeach(_dep)
+        endif(SUBSYS_OPT_DEPS)
     endif(${_var} AND (NOT ("${subsys_status}" STREQUAL "AUTO_OFF")))
 endmacro(PCL_SUBSYS_DEPEND)
 
@@ -196,12 +202,12 @@ macro(PCL_ADD_LIBRARY _name _component)
       target_link_libraries(${_name} gomp)
     endif()
 	
-	if(MSVC90 OR MSVC10)
+	if(MSVC)
 	  target_link_libraries(${_name} delayimp.lib)  # because delay load is enabled for openmp.dll
 	endif()
 
     set_target_properties(${_name} PROPERTIES
-        VERSION ${PCL_VERSION}
+        VERSION ${PCL_VERSION_PLAIN}
         SOVERSION ${PCL_MAJOR_VERSION}.${PCL_MINOR_VERSION}
         DEFINE_SYMBOL "PCLAPI_EXPORTS")
     if(USE_PROJECT_FOLDERS)
@@ -234,7 +240,7 @@ macro(PCL_CUDA_ADD_LIBRARY _name _component)
     target_link_libraries(${_name} ${Boost_LIBRARIES})
 
     set_target_properties(${_name} PROPERTIES
-        VERSION ${PCL_VERSION}
+        VERSION ${PCL_VERSION_PLAIN}
         SOVERSION ${PCL_MAJOR_VERSION}
         DEFINE_SYMBOL "PCLAPI_EXPORTS")
     if(USE_PROJECT_FOLDERS)
@@ -444,7 +450,7 @@ endmacro(PCL_ADD_LINKFLAGS)
 
 ###############################################################################
 # Make a pkg-config file for a library. Do not include general PCL stuff in the
-# arguments; they will be added automaticaly.
+# arguments; they will be added automatically.
 # _name The library name. "pcl_" will be preprended to this.
 # _component The part of PCL that this pkg-config file belongs to.
 # _desc Description of the library.
@@ -481,7 +487,7 @@ endmacro(PCL_MAKE_PKGCONFIG)
 # Essentially a duplicate of PCL_MAKE_PKGCONFIG, but 
 # ensures that no -L or l flags will be created
 # Do not include general PCL stuff in the
-# arguments; they will be added automaticaly.
+# arguments; they will be added automatically.
 # _name The library name. "pcl_" will be preprended to this.
 # _component The part of PCL that this pkg-config file belongs to.
 # _desc Description of the library.
@@ -617,7 +623,7 @@ endmacro(PCL_GET_SUBSUBSYS_STATUS)
 ###############################################################################
 # Set the hyperstatus of a subsystem and its dependee
 # _name Subsystem name.
-# _dependee Dependant subsystem.
+# _dependee Dependent subsystem.
 # _status AUTO_OFF to disable AUTO_ON to enable
 # ARGN[0] Reason for not building.
 macro(PCL_SET_SUBSYS_HYPERSTATUS _name _dependee _status) 
@@ -630,7 +636,7 @@ endmacro(PCL_SET_SUBSYS_HYPERSTATUS)
 ###############################################################################
 # Get the hyperstatus of a subsystem and its dependee
 # _name IN subsystem name.
-# _dependee IN dependant subsystem.
+# _dependee IN dependent subsystem.
 # _var OUT hyperstatus
 # ARGN[0] Reason for not building.
 macro(PCL_GET_SUBSYS_HYPERSTATUS _var _name)
@@ -846,7 +852,7 @@ endmacro(PCL_ADD_DOC)
 # This macro adds on option named "WITH_NAME", where NAME is the capitalized
 # dependency name. The user may use this option to control whether the
 # corresponding grabber should be built or not. Also an attempt to find a
-# package with the given name is made. If it is not successfull, then the
+# package with the given name is made. If it is not successful, then the
 # "WITH_NAME" option is coerced to FALSE.
 macro(PCL_ADD_GRABBER_DEPENDENCY _name _description)
     string(TOUPPER ${_name} _name_capitalized)
@@ -862,3 +868,11 @@ macro(PCL_ADD_GRABBER_DEPENDENCY _name _description)
       endif()
     endif()
 endmacro(PCL_ADD_GRABBER_DEPENDENCY)
+
+###############################################################################
+# Set the dependencies for a specific test module on the provided variable
+# _var The variable to be filled with the dependencies
+# _module The module name
+macro(PCL_SET_TEST_DEPENDENCIES _var _module)
+    set(${_var} global_tests ${_module} ${PCL_SUBSYS_DEPS_${_module}})
+endmacro(PCL_SET_TEST_DEPENDENCIES)

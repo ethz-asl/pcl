@@ -69,7 +69,9 @@ namespace pcl
 #include <iostream>
 #include <stdarg.h>
 #include <stdio.h>
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 
 // MSCV doesn't have std::{isnan,isfinite}
@@ -287,6 +289,25 @@ log2f (float x)
     #define PCLAPI(rettype) PCL_EXTERN_C PCL_EXPORTS rettype PCL_CDECL
 #endif
 
+// Macro for pragma operator
+#if (defined (__GNUC__) || defined(__clang__))
+  #define PCL_PRAGMA(x) _Pragma (#x)
+#elif _MSC_VER
+  #define PCL_PRAGMA(x) __pragma (#x)
+#else
+  #define PCL_PRAGMA
+#endif
+
+// Macro for emitting pragma warning
+#if (defined (__GNUC__) || defined(__clang__))
+  #define PCL_PRAGMA_WARNING(x) PCL_PRAGMA (GCC warning x)
+#elif _MSC_VER
+  #define PCL_PRAGMA_WARNING(x) PCL_PRAGMA (warning (x))
+#else
+  #define PCL_PRAGMA_WARNING
+#endif
+
+
 // Macro to deprecate old functions
 //
 // Usage:
@@ -377,6 +398,10 @@ log2f (float x)
   #define MALLOC_ALIGNED 1
 #endif
 
+#if defined (HAVE_MM_MALLOC)
+  #include <mm_malloc.h>
+#endif
+
 inline void*
 aligned_malloc (size_t size)
 {
@@ -405,7 +430,7 @@ aligned_free (void* ptr)
 #if   defined (MALLOC_ALIGNED) || defined (HAVE_POSIX_MEMALIGN)
   std::free (ptr);
 #elif defined (HAVE_MM_MALLOC)
-  ptr = _mm_free (ptr);
+  _mm_free (ptr);
 #elif defined (_MSC_VER)
   _aligned_free (ptr);
 #elif defined (ANDROID)

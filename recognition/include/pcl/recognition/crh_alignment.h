@@ -176,7 +176,7 @@ namespace pcl
 
       }
 
-      /** \brief Computes the roll angle that aligns input to modle.
+      /** \brief Computes the roll angle that aligns input to model.
        * \param[in] input_ftt CRH histogram of the input cloud
        * \param[in] target_ftt CRH histogram of the target cloud
        * \param[out] peaks Vector containing angles where the histograms correlate
@@ -213,7 +213,7 @@ namespace pcl
           multAB[k].r = a * c - b * d;
           multAB[k].i = b * c + a * d;
 
-          float tmp = sqrtf (multAB[k].r * multAB[k].r + multAB[k].i * multAB[k].i);
+          float tmp = std::sqrt (multAB[k].r * multAB[k].r + multAB[k].i * multAB[k].i);
 
           multAB[k].r /= tmp;
           multAB[k].i /= tmp;

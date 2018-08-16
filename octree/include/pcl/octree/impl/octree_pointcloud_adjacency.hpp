@@ -38,7 +38,16 @@
 #ifndef PCL_OCTREE_POINTCLOUD_ADJACENCY_HPP_
 #define PCL_OCTREE_POINTCLOUD_ADJACENCY_HPP_
 
-#include <pcl/octree/octree_pointcloud_adjacency.h>
+#include <pcl/console/print.h>
+#include <pcl/common/geometry.h>
+/*
+ * OctreePointCloudAdjacency is not precompiled, since it's used in other
+ * parts of PCL with custom LeafContainers. So if PCL_NO_PRECOMPILE is NOT
+ * used, octree_pointcloud_adjacency.h includes this file but octree_pointcloud.h
+ * would not include the implementation because it's precompiled. So we need to
+ * include it here "manually".
+ */
+#include <pcl/octree/impl/octree_pointcloud.hpp>
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template<typename PointT, typename LeafContainerT, typename BranchContainerT> 
@@ -82,9 +91,9 @@ pcl::octree::OctreePointCloudAdjacency<PointT, LeafContainerT, BranchContainerT>
   OctreePointCloud<PointT, LeafContainerT, BranchContainerT>::addPointsFromInputCloud ();
   
   LeafContainerT *leaf_container;
-  typename OctreeAdjacencyT::LeafNodeIterator leaf_itr;
+  typename OctreeAdjacencyT::LeafNodeDepthFirstIterator leaf_itr;
   leaf_vector_.reserve (this->getLeafCount ());
-  for ( leaf_itr = this->leaf_begin () ; leaf_itr != this->leaf_end (); ++leaf_itr)
+  for ( leaf_itr = this->leaf_depth_begin () ; leaf_itr != this->leaf_depth_end (); ++leaf_itr)
   {
     OctreeKey leaf_key = leaf_itr.getCurrentOctreeKey ();
     leaf_container = &(leaf_itr.getLeafContainer ());
@@ -212,7 +221,7 @@ pcl::octree::OctreePointCloudAdjacency<PointT, LeafContainerT, BranchContainerT>
   voxel_adjacency_graph.clear ();
   //Add a vertex for each voxel, store ids in map
   std::map <LeafContainerT*, VoxelID> leaf_vertex_id_map;
-  for (typename OctreeAdjacencyT::LeafNodeIterator leaf_itr = this->leaf_begin () ; leaf_itr != this->leaf_end (); ++leaf_itr)
+  for (typename OctreeAdjacencyT::LeafNodeDepthFirstIterator leaf_itr = this->leaf_depth_begin () ; leaf_itr != this->leaf_depth_end (); ++leaf_itr)
   {
     OctreeKey leaf_key = leaf_itr.getCurrentOctreeKey ();
     PointT centroid_point;

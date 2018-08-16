@@ -12,6 +12,14 @@ endif(WIN32)
 
 PCL_ADD_DOC("${SUBSYS_NAME}")
 
+if(NOT WIN32)
+  option(PCL_IO_ENABLE_MAND_LOCKING "Enables the use of mandatory locking on filesystems mounted using the mand option." ON)
+  mark_as_advanced(PCL_IO_ENABLE_MAND_LOCKING)
+  if (NOT PCL_IO_ENABLE_MAND_LOCKING)
+    add_definitions(-DNO_MANDATORY_LOCKING)
+  endif(NOT PCL_IO_ENABLE_MAND_LOCKING)
+endif(NOT WIN32)
+
 if(build)
     if(WITH_OPENNI2)
         set(IMAGE_INCLUDES
@@ -197,6 +205,8 @@ if(build)
        )
     PCL_ADD_LIBRARY(pcl_io_ply "${SUBSYS_NAME}" ${PLY_SOURCES} ${PLY_INCLUDES})
     PCL_ADD_INCLUDES("${SUBSYS_NAME}" "${SUBSYS_NAME}/ply" ${PLY_INCLUDES})
+    target_include_directories(pcl_io_ply PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 
     set(srcs
         src/debayer.cpp
@@ -246,6 +256,7 @@ if(build)
         "include/pcl/${SUBSYS_NAME}/debayer.h"
         "include/pcl/${SUBSYS_NAME}/file_io.h"
         "include/pcl/${SUBSYS_NAME}/auto_io.h"
+        "include/pcl/${SUBSYS_NAME}/low_level_io.h"
         "include/pcl/${SUBSYS_NAME}/lzf.h"
         "include/pcl/${SUBSYS_NAME}/lzf_image_io.h"
         "include/pcl/${SUBSYS_NAME}/io.h"
@@ -316,9 +327,9 @@ if(build)
 
     set(LIB_NAME "pcl_${SUBSYS_NAME}")
 
-    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include" ${VTK_INCLUDE_DIRECTORIES})
     add_definitions(${VTK_DEFINES})
     PCL_ADD_LIBRARY("${LIB_NAME}" "${SUBSYS_NAME}" ${srcs} ${incs} ${compression_incs} ${impl_incs} ${OPENNI_INCLUDES} ${OPENNI2_INCLUDES})
+    target_include_directories(${LIB_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" ${VTK_INCLUDE_DIRECTORIES})
     link_directories(${VTK_LINK_DIRECTORIES})
     target_link_libraries("${LIB_NAME}" pcl_common pcl_io_ply ${VTK_LIBRARIES} )
     if(PNG_FOUND)

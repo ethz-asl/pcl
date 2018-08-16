@@ -66,8 +66,13 @@ macro(DISSECT_VERSION)
         PCL_MINOR_VERSION "${PCL_VERSION}")
     string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1"
         PCL_REVISION_VERSION "${PCL_VERSION}")
-    string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+(.*)" "\\1"
-        PCL_CANDIDATE_VERSION "${PCL_VERSION}")
+    set(PCL_VERSION_PLAIN "${PCL_MAJOR_VERSION}.${PCL_MINOR_VERSION}.${PCL_REVISION_VERSION}")
+    if(${PCL_VERSION} MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+-dev$")
+        set(PCL_DEV_VERSION 1)
+        set(PCL_VERSION_PLAIN "${PCL_VERSION_PLAIN}.99")
+    else()
+        set(PCL_DEV_VERSION 0)
+    endif()
 endmacro(DISSECT_VERSION)
 
 ###############################################################################
@@ -400,7 +405,7 @@ macro(sort_relative _list _sorted_list _to_sort_relative)
   if(NOT (list_length EQUAL to_sort_list_length))
     message(FATAL_ERROR "size mismatch between ${_to_sort_relative} ${to_sort_list_length} and ${_list} ${list_length}")
   endif(NOT (list_length EQUAL to_sort_list_length))
-  # unset the temporary list to avoid suprises (I had some them and were hard to find)
+  # unset the temporary list to avoid surprises (I had some them and were hard to find)
   unset(tmp_list)
   # fill it with a dummy value
   fill_list(tmp_list list_length "#")

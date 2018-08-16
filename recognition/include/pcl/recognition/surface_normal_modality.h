@@ -208,9 +208,9 @@ namespace pcl
       // normalize normals
       for (int normal_index = 0; normal_index < nr_normals; ++normal_index)
       {
-        const float length = sqrtf (ref_normals[normal_index].x * ref_normals[normal_index].x +
-                                    ref_normals[normal_index].y * ref_normals[normal_index].y +
-                                    ref_normals[normal_index].z * ref_normals[normal_index].z);
+        const float length = std::sqrt (ref_normals[normal_index].x * ref_normals[normal_index].x +
+                                        ref_normals[normal_index].y * ref_normals[normal_index].y +
+                                        ref_normals[normal_index].z * ref_normals[normal_index].z);
 
         const float inv_length = 1.0f / length;
 
@@ -229,7 +229,7 @@ namespace pcl
             PointXYZ normal (static_cast<float> (x_index - range_x/2), 
                              static_cast<float> (y_index - range_y/2), 
                              static_cast<float> (z_index - range_z));
-            const float length = sqrtf (normal.x*normal.x + normal.y*normal.y + normal.z*normal.z);
+            const float length = std::sqrt (normal.x*normal.x + normal.y*normal.y + normal.z*normal.z);
             const float inv_length = 1.0f / (length + 0.00001f);
 
             normal.x *= inv_length;
@@ -372,7 +372,7 @@ namespace pcl
         return (filtered_quantized_surface_normals_); 
       }
 
-      /** \brief Returns a reference to the internal spreaded quantized map. */
+      /** \brief Returns a reference to the internal spread quantized map. */
       inline QuantizedMap &
       getSpreadedQuantizedMap () 
       { 
@@ -476,7 +476,7 @@ namespace pcl
       pcl::QuantizedMap quantized_surface_normals_;
       /** \brief Filtered quantized surface normals. */
       pcl::QuantizedMap filtered_quantized_surface_normals_;
-      /** \brief Spreaded quantized surface normals. */
+      /** \brief Spread quantized surface normals. */
       pcl::QuantizedMap spreaded_quantized_surface_normals_;
 
       /** \brief Map containing surface normal orientations. */
@@ -670,7 +670,7 @@ pcl::SurfaceNormalModality<PointInT>::computeAndQuantizeSurfaceNormals ()
       }
       else
       {
-        const float normInv = 1.0f / sqrtf (length);
+        const float normInv = 1.0f / std::sqrt (length);
 
         const float normal_x = nx * normInv;
         const float normal_y = ny * normInv;
@@ -891,7 +891,7 @@ pcl::SurfaceNormalModality<PointInT>::computeAndQuantizeSurfaceNormals2 ()
         //double l_ny = l_ddy * dummy_focal_length;
         //double l_nz = -l_det * l_d;
 
-        float l_sqrt = sqrtf (l_nx * l_nx + l_ny * l_ny + l_nz * l_nz);
+        float l_sqrt = std::sqrt (l_nx * l_nx + l_ny * l_ny + l_nz * l_nz);
 
         if (l_sqrt > 0)
         {

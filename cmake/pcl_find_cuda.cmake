@@ -8,11 +8,12 @@ if(MSVC)
 endif()
 
 set(CUDA_FIND_QUIETLY TRUE)
-find_package(CUDA 4)
+find_package(CUDA)
 
 if(CUDA_FOUND)
 	message(STATUS "Found CUDA Toolkit v${CUDA_VERSION_STRING}")
-	
+  set(HAVE_CUDA TRUE)
+
 	if(${CUDA_VERSION_STRING} VERSION_LESS "7.5")
 	  # Recent versions of cmake set CUDA_HOST_COMPILER to CMAKE_C_COMPILER which
 	  # on OSX defaults to clang (/usr/bin/cc), but this is not a supported cuda
@@ -43,8 +44,10 @@ if(CUDA_FOUND)
 	
 	# Find a complete list for CUDA compute capabilities at http://developer.nvidia.com/cuda-gpus
 
-        if(NOT ${CUDA_VERSION_STRING} VERSION_LESS "8.0")
-                set(__cuda_arch_bin "2.0 2.1(2.0) 3.0 3.5 5.0 5.2 6.0 6.1")
+        if(NOT ${CUDA_VERSION_STRING} VERSION_LESS "9.0")
+                set(__cuda_arch_bin "3.0 3.5 5.0 5.2 5.3 6.0 6.1 7.0")
+        elseif(NOT ${CUDA_VERSION_STRING} VERSION_LESS "8.0")
+                set(__cuda_arch_bin "2.0 2.1(2.0) 3.0 3.5 5.0 5.2 5.3 6.0 6.1")
         elseif(NOT ${CUDA_VERSION_STRING} VERSION_LESS "6.5")
                 set(__cuda_arch_bin "2.0 2.1(2.0) 3.0 3.5 5.0 5.2")
         elseif(NOT ${CUDA_VERSION_STRING} VERSION_LESS "6.0")
@@ -66,4 +69,6 @@ if(CUDA_FOUND)
 	include(${PCL_SOURCE_DIR}/cmake/CudaComputeTargetFlags.cmake)
 	APPEND_TARGET_ARCH_FLAGS()
 
+  # Prevent compilation issues between recent gcc versions and old CUDA versions
+  list(APPEND CUDA_NVCC_FLAGS "-D_FORCE_INLINES")
 endif()

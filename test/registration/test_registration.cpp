@@ -61,7 +61,7 @@
 #include <pcl/registration/ppf_registration.h>
 #include <pcl/registration/ndt.h>
 #include <pcl/registration/sample_consensus_prerejective.h>
-// We need Histogram<2> to function, so we'll explicitely add kdtree_flann.hpp here
+// We need Histogram<2> to function, so we'll explicitly add kdtree_flann.hpp here
 #include <pcl/kdtree/impl/kdtree_flann.hpp>
 //(pcl::Histogram<2>)
 
@@ -162,11 +162,6 @@ TEST (PCL, IterativeClosestPoint)
 {
   IterativeClosestPoint<PointXYZ, PointXYZ> reg;
   PointCloud<PointXYZ>::ConstPtr source (cloud_source.makeShared ());
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  reg.setInputCloud (source);     // test for PCL_DEPRECATED
-  source = reg.getInputCloud ();  // test for PCL_DEPRECATED
-#pragma GCC diagnostic pop
   reg.setInputSource (source);
   reg.setInputTarget (cloud_target.makeShared ());
   reg.setMaximumIterations (50);

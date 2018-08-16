@@ -41,13 +41,11 @@
 
 #include <vector>
 
-#include "octree_nodes.h"
-#include "octree_container.h"
-#include "octree_key.h"
-#include "octree_iterator.h"
+#include <pcl/octree/octree_nodes.h>
+#include <pcl/octree/octree_container.h>
+#include <pcl/octree/octree_key.h>
+#include <pcl/octree/octree_iterator.h>
 
-#include <stdio.h>
-#include <string.h>
 
 namespace pcl
 {
@@ -235,7 +233,8 @@ namespace pcl
         friend class OctreeIteratorBase<OctreeT> ;
         friend class OctreeDepthFirstIterator<OctreeT> ;
         friend class OctreeBreadthFirstIterator<OctreeT> ;
-        friend class OctreeLeafNodeIterator<OctreeT> ;
+        friend class OctreeLeafNodeDepthFirstIterator<OctreeT> ;
+        friend class OctreeLeafNodeBreadthFirstIterator<OctreeT> ;
 
         typedef BufferedBranchNode<BranchContainerT> BranchNode;
         typedef OctreeLeafNode<LeafContainerT> LeafNode;
@@ -250,10 +249,36 @@ namespace pcl
         const Iterator end() {return Iterator();};
 
         // Octree leaf node iterators
-        typedef OctreeLeafNodeIterator<OctreeT> LeafNodeIterator;
-        typedef const OctreeLeafNodeIterator<OctreeT> ConstLeafNodeIterator;
-        LeafNodeIterator leaf_begin(unsigned int max_depth_arg = 0) {return LeafNodeIterator(this, max_depth_arg);};
-        const LeafNodeIterator leaf_end() {return LeafNodeIterator();};
+        // The previous deprecated names
+        // LeafNodeIterator and ConstLeafNodeIterator are deprecated.
+        // Please use LeafNodeDepthFirstIterator and ConstLeafNodeDepthFirstIterator instead.
+        typedef OctreeLeafNodeDepthFirstIterator<OctreeT> LeafNodeIterator;
+        typedef const OctreeLeafNodeDepthFirstIterator<OctreeT> ConstLeafNodeIterator;
+
+        PCL_DEPRECATED ("Please use leaf_depth_begin () instead.")
+        LeafNodeIterator leaf_begin (unsigned int max_depth_arg = 0)
+        {
+          return LeafNodeIterator (this, max_depth_arg);
+        };
+
+        PCL_DEPRECATED ("Please use leaf_depth_end () instead.")
+        const LeafNodeIterator leaf_end ()
+        {
+          return LeafNodeIterator ();
+        };
+
+        // The currently valide names
+        typedef OctreeLeafNodeDepthFirstIterator<OctreeT> LeafNodeDepthFirstIterator;
+        typedef const OctreeLeafNodeDepthFirstIterator<OctreeT> ConstLeafNodeDepthFirstIterator;
+        LeafNodeDepthFirstIterator leaf_depth_begin (unsigned int max_depth_arg = 0)
+        {
+          return LeafNodeDepthFirstIterator (this, max_depth_arg);
+        };
+
+        const LeafNodeDepthFirstIterator leaf_depth_end ()
+        {
+          return LeafNodeDepthFirstIterator();
+        };
 
         // Octree depth-first iterators
         typedef OctreeDepthFirstIterator<OctreeT> DepthFirstIterator;
@@ -266,6 +291,20 @@ namespace pcl
         typedef const OctreeBreadthFirstIterator<OctreeT> ConstBreadthFirstIterator;
         BreadthFirstIterator breadth_begin(unsigned int max_depth_arg = 0) {return BreadthFirstIterator(this, max_depth_arg);};
         const BreadthFirstIterator breadth_end() {return BreadthFirstIterator();};
+
+        // Octree leaf node iterators
+        typedef OctreeLeafNodeBreadthFirstIterator<OctreeT> LeafNodeBreadthIterator;
+        typedef const OctreeLeafNodeBreadthFirstIterator<OctreeT> ConstLeafNodeBreadthIterator;
+
+        LeafNodeBreadthIterator leaf_breadth_begin (unsigned int max_depth_arg = 0u)
+        {
+          return LeafNodeBreadthIterator (this, max_depth_arg? max_depth_arg : this->octree_depth_);
+        };
+
+        const LeafNodeBreadthIterator leaf_breadth_end ()
+        {
+          return LeafNodeBreadthIterator (this, 0, NULL);
+        };
 
         /** \brief Empty constructor. */
         Octree2BufBase ();
@@ -491,7 +530,7 @@ namespace pcl
           return ret;
         }
 
-        /** \brief Check for leaf not existance in the octree
+        /** \brief Check if leaf doesn't exist in the octree
          *  \param key_arg: octree key addressing a leaf node.
          *  \return "true" if leaf node is found; "false" otherwise
          * */
@@ -920,7 +959,9 @@ namespace pcl
   }
 }
 
-//#include "impl/octree2buf_base.hpp"
+#ifdef PCL_NO_PRECOMPILE
+#include <pcl/octree/impl/octree2buf_base.hpp>
+#endif
 
 #endif
 

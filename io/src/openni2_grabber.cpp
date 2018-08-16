@@ -53,7 +53,7 @@
 
 using namespace pcl::io::openni2;
 
-namespace pcl
+namespace
 {
   // Treat color as chars, float32, or uint32
   typedef union
@@ -347,7 +347,7 @@ pcl::io::OpenNI2Grabber::setupDevice (const std::string& device_id, const Mode& 
   }
   catch (...)
   {
-    PCL_THROW_EXCEPTION (pcl::IOException, "unknown error occured");
+    PCL_THROW_EXCEPTION (pcl::IOException, "unknown error occurred");
   }
 
   typedef pcl::io::openni2::OpenNI2VideoMode VideoMode;
